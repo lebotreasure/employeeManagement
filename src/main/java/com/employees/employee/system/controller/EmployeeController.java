@@ -39,9 +39,21 @@ public class EmployeeController {
         return employeeRepo.save(employee);
     }
 
-    @PutMapping("/{id}")
-    public Employee update(@Validated @NonNull @RequestBody Employee employee) {
-        return employeeRepo.save(employee);
+    @PutMapping
+    public Employee update(@Validated @NonNull @RequestBody final Employee employee) {
+        Optional<Employee> existingEmployee = employeeRepo.findById(employee.getId());
+        if (existingEmployee.isPresent()) {
+            return existingEmployee.map(ee -> {
+                ee.setFirstName(employee.getFirstName());
+                ee.setLastName(employee.getLastName());
+                ee.setEmail(employee.getEmail());
+                ee.setDepartment(employee.getDepartment());
+                ee.setContactNo(employee.getContactNo());
+                return employeeRepo.save(ee);
+            }).get();
+        }
+        
+        return null;
     }
 
     @DeleteMapping(value = "/{id}")
